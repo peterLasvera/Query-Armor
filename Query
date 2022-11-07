@@ -1,0 +1,124 @@
+1. Last Activity Database
+2. Kill All connection
+3. Fix User Login Because Backup Restore
+4. Backup Diff ALL DB with Compress
+5. Backup Full ALL DB with Compress
+6. 
+
+
+------------------------1. Last Activity Database--------------------------
+SELECT d.name,
+last_user_seek = MAX(last_user_seek),
+last_user_scan = MAX(last_user_scan),
+last_user_lookup = MAX(last_user_lookup),
+last_user_update = MAX(last_user_update)
+FROM sys.dm_db_index_usage_stats AS i
+JOIN sys.databases AS d ON i.database_id=d.database_id
+GROUP BY d.name
+
+------------------------2. Kill All connection--------------------------
+USE [master];
+
+DECLARE @kill varchar(8000) = '';  
+SELECT @kill = @kill + 'kill ' + CONVERT(varchar(5), session_id) + ';'  
+FROM sys.dm_exec_sessions
+WHERE session_id > 50
+
+EXEC(@kill);
+
+------------------------3. Fix User Login Because Backup Restore--------------------------
+declare @name varchar(150)
+declare @query nvarchar (500)
+
+DECLARE cur CURSOR FOR
+    select name from master..syslogins
+
+Open cur
+
+FETCH NEXT FROM cur into @name
+
+WHILE @@FETCH_STATUS = 0
+BEGIN
+
+set @query='USE [?]
+IF ''?'' <> ''master'' AND ''?'' <> ''model'' AND ''?'' <> ''msdb'' AND ''?'' <> ''tempdb''
+BEGIN   
+exec sp_change_users_login ''Auto_Fix'', '''+ @name +'''
+END'
+
+EXEC master..sp_MSForeachdb @query
+
+    FETCH NEXT FROM cur into @name
+
+END
+
+CLOSE cur
+DEALLOCATE cur
+
+------------------------4. Backup Diff ALL DB with Compress--------------------------
+
+
+DECLARE @name NVARCHAR(256) -- database name  
+DECLARE @path NVARCHAR(512) -- path for backup files  
+DECLARE @fileName NVARCHAR(512) -- filename for backup  
+DECLARE @fileDate NVARCHAR(40) -- used for file name
+ 
+-- specify database backup directory
+SET @path = 'C:\Program Files\Microsoft SQL Server\MSSQL14.MSSQLSERVER\MSSQL\Backup\'  
+ 
+-- specify filename format
+SELECT @fileDate = CONVERT(NVARCHAR(20),GETDATE(),112) 
+ 
+DECLARE db_cursor CURSOR READ_ONLY FOR  
+SELECT name 
+FROM master.sys.databases 
+WHERE name NOT IN ('master','model','msdb','tempdb')  -- exclude these databases
+AND state = 0 -- database is online
+AND is_in_standby = 0 -- database is not read only for log shipping
+ 
+OPEN db_cursor   
+FETCH NEXT FROM db_cursor INTO @name   
+ 
+WHILE @@FETCH_STATUS = 0   
+BEGIN   
+   SET @fileName = @path + @name + '_' + @fileDate + 'DIFF.BAK'  
+   BACKUP DATABASE @name TO DISK = @fileName WITH STATS=10, COMPRESSION, DIFFERENTIAL
+ 
+   FETCH NEXT FROM db_cursor INTO @name   
+END   
+ 
+CLOSE db_cursor   
+DEALLOCATE db_cursor
+
+------------------------5. Backup Full ALL DB with Compress--------------------------
+DECLARE @name NVARCHAR(256) -- database name  
+DECLARE @path NVARCHAR(512) -- path for backup files  
+DECLARE @fileName NVARCHAR(512) -- filename for backup  
+DECLARE @fileDate NVARCHAR(40) -- used for file name
+ 
+-- specify database backup directory
+SET @path = 'C:\Program Files\Microsoft SQL Server\MSSQL14.MSSQLSERVER\MSSQL\Backup\'  
+ 
+-- specify filename format
+SELECT @fileDate = CONVERT(NVARCHAR(20),GETDATE(),112) 
+ 
+DECLARE db_cursor CURSOR READ_ONLY FOR  
+SELECT name 
+FROM master.sys.databases 
+WHERE name NOT IN ('master','model','msdb','tempdb')  -- exclude these databases
+AND state = 0 -- database is online
+AND is_in_standby = 0 -- database is not read only for log shipping
+ 
+OPEN db_cursor   
+FETCH NEXT FROM db_cursor INTO @name   
+ 
+WHILE @@FETCH_STATUS = 0   
+BEGIN   
+   SET @fileName = @path + @name + '_' + @fileDate + '.BAK'  
+   BACKUP DATABASE @name TO DISK = @fileName WITH STATS=10, COMPRESSION
+ 
+   FETCH NEXT FROM db_cursor INTO @name   
+END   
+ 
+CLOSE db_cursor   
+DEALLOCATE db_cursor
