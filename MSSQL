@@ -4,6 +4,7 @@
 4. Backup Diff ALL DB with Compress
 5. Backup Full ALL DB with Compress
 6. Recovery Database
+7. get all databases with MDF and LDF File Location
 
 
 ------------------------1. Last Activity Database--------------------------
@@ -136,3 +137,13 @@ GO
 
 ALTER DATABASE [Kemenkeu] set multi_user
 GO
+
+------------------------7. get all databases with MDF and LDF File Location------------------------
+SELECT
+    db.name AS DBName,
+    type_desc AS FileType,
+    Physical_Name AS Location
+FROM
+    sys.master_files mf
+INNER JOIN 
+    sys.databases db ON db.database_id = mf.database_id
