@@ -1,5 +1,42 @@
 1. Check All Database Size
+2. Create Role Read Only and Read Write
 
 
 ------------------1. Check All Database Size-------------------
 SELECT pg_database.datname as "database_name", pg_database_size(pg_database.datname)/1024/1024 AS size_in_mb FROM pg_database ORDER by size_in_mb DESC;
+
+
+
+------------------2. Create Role Read Only and Read Write-------------------
+-- Making sure roles can't do anything on the database without explicit grant
+REVOKE CREATE ON SCHEMA public FROM PUBLIC;
+REVOKE ALL ON DATABASE my_database FROM PUBLIC;
+CREATE SCHEMA my_schema;
+
+-- Read-write
+CREATE ROLE read_write;
+
+GRANT CONNECT ON DATABASE my_database TO read_write;
+GRANT USAGE, CREATE ON SCHEMA my_schema TO read_write;
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA my_schema TO read_write;
+ALTER DEFAULT PRIVILEGES IN SCHEMA my_schema GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO read_write;
+
+GRANT USAGE ON ALL SEQUENCES IN SCHEMA my_schema TO read_write;
+ALTER DEFAULT PRIVILEGES IN SCHEMA my_schema GRANT USAGE ON SEQUENCES TO read_write;
+
+-- Read-only
+CREATE ROLE read_only;
+
+GRANT CONNECT ON DATABASE my_database TO read_only;
+GRANT USAGE ON SCHEMA my_schema TO read_only;
+
+GRANT SELECT ON ALL TABLES IN SCHEMA my_schema TO read_only;
+ALTER DEFAULT PRIVILEGES IN SCHEMA my_schema GRANT SELECT ON TABLES TO read_only;
+
+-- Users
+CREATE USER read_write_user WITH PASSWORD 'password_1';
+GRANT read_write TO my_database;
+
+CREATE USER read_only_user WITH PASSWORD 'password_2';
+GRANT read_only TO my_database_read_only;
