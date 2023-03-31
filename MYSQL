@@ -1,0 +1,19 @@
+1. List All user
+2. Connect database
+3. Create User
+
+
+
+-----------------1. List All user--------------
+mysql> SELECT user,host,password_expired,password_last_changed,password_lifetime,account_locked FROM mysql.user;
+
+-----------------2. Connect database--------------
+mysql -u root -p
+Enter password: ***********
+mysql> use mysql;
+Database changed
+
+-----------------3. Create User--------------
+CREATE USER 'myuser'@'%' IDENTIFIED BY 'mypass';
+GRANT ALL ON *.* TO 'myuser'@'%';
+FLUSH PRIVILEGES;
