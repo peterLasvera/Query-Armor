@@ -5,6 +5,7 @@
 5. Backup Full ALL DB with Compress
 6. Recovery Database
 7. get all databases with MDF and LDF File Location
+8. Change database owner to sa for all user databases
 
 
 ------------------------1. Last Activity Database--------------------------
@@ -146,4 +147,7 @@ SELECT
 FROM
     sys.master_files mf
 INNER JOIN 
-    sys.databases db ON db.database_id = mf.database_id
+    sys.databases db ON db.database_id = mf.database_id  
+
+------------------------8. Change database owner to sa for all user databases------------------------
+ SELECT 'use '+QUOTENAME(name)+ ' exec sp_changedbowner @loginame =''sa'' ' FROM sys.databases AS d WHERE d.database_id>4 and d.is_read_only = 0
