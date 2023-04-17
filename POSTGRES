@@ -1,5 +1,6 @@
 1. Check All Database Size
 2. Create Role Read Only and Read Write
+3. Check Hostname
 
 
 ------------------1. Check All Database Size-------------------
@@ -40,3 +41,6 @@ GRANT read_write TO my_database;
 
 CREATE USER read_only_user WITH PASSWORD 'password_2';
 GRANT read_only TO my_database_read_only;
+
+------------------3. Check Hostname-------------------
+select pg_read_file('/etc/hostname') as hostname;
