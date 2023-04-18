@@ -1,0 +1,31 @@
+1. Monitoring Fast Recovery Area Space Usage
+2. calculate current DB size
+
+
+-----------------1. Monitoring Fast Recovery Area Space Usage-------------------
+SELECT * FROM V$RECOVERY_FILE_DEST;
+
+NAME         SPACE_LIMIT SPACE_USED SPACE_RECLAIMABLE NUMBER_OF_FILES
+-------------- ----------- ---------- ----------------- ---------------
+/mydisk/rcva 5368709120  109240320  256000            28
+
+SELECT * FROM V$RECOVERY_AREA_USAGE;
+
+FILE_TYPE    PERCENT_SPACE_USED  PERCENT_SPACE_RECLAIMABLE  NUMBER_OF_FILES
+------------ ------------------  -------------------------  ---------------
+CONTROLFILE        0                  0                         0
+ONLINELOG          2                  0                         22
+ARCHIVELOG         4.05              2.01                       31
+BACKUPPIECE        3.94              3.86                       8
+IMAGECOPY         15.64              10.43                      66
+FLASHBACKLOG       .08                0                         1
+
+-----------------2. calculate current DB size-------------------
+The size of the database is the space the files physically consume on disk. You can find this with:
+select sum(bytes)/1024/1024 size_in_mb from dba_data_files;
+
+But not all this space is necessarily allocated. There could be sections of these files that are not used. You can find the total space that is used with:
+select sum(bytes)/1024/1024 size_in_mb from dba_segments;
+
+You can break this down by user by running:
+select owner, sum(bytes)/1024/1024 Size_MB from dba_segments group  by owner;
