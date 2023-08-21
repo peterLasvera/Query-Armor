@@ -1,0 +1,18 @@
+--------------1. Trx Ovo Gopay
+
+SELECT
+	transaction_date AS TANGGAL,
+	reference_number AS NO_REFERENSI,
+	from_account_number AS NO_REKENING,
+	biller_name AS TRANSAKSI,
+	customer_reference AS KETERANGAN,
+	transaction_amount AS NOMINAL,
+	fee AS FEE,
+	status AS STATUS,
+	CASE WHEN response_code='00' THEN ' ' ELSE 'Response Code '||response_code END AS KETERANGAN_GAGAL
+FROM
+	"ebanking"."t_transaction" 
+WHERE
+	"transaction_type" = '8m' 
+	AND ( "biller_name" = 'TOP UP GOPAY' OR "biller_name" = 'TOP UP OVO' ) 
+	ORDER BY transaction_date ASC
