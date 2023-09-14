@@ -1,5 +1,6 @@
 1. Monitoring Fast Recovery Area Space Usage
 2. calculate current DB size
+3. List All Schema
 
 
 -----------------1. Monitoring Fast Recovery Area Space Usage-------------------
@@ -29,3 +30,6 @@ select sum(bytes)/1024/1024 size_in_mb from dba_segments;
 
 You can break this down by user by running:
 select owner, sum(bytes)/1024/1024 Size_MB from dba_segments group  by owner;
+
+-----------------3. List All Schema-------------------
+SELECT username FROM dba_users
