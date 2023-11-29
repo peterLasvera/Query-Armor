@@ -145,6 +145,8 @@ SELECT
     db.name AS DBName,
     type_desc AS FileType,
     Physical_Name AS Location
+	size,
+	recovery_model_desc
 FROM
     sys.master_files mf
 INNER JOIN 
