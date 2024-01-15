@@ -7,6 +7,7 @@
 7. get all databases with MDF and LDF File Location
 8. Change database owner to sa for all user databases
 9. Stored Procedure User Migration
+10. Release Table Locking
 
 
 ------------------------1. Last Activity Database--------------------------
@@ -367,3 +368,15 @@ INNER JOIN
       DEALLOCATE login_curs
       RETURN 0
   END
+
+------------------------10. Release Table Locking--------------------------
+-- Find the open transactoin
+DBCC opentran()
+
+-- Check the details of the query and the query plan
+exec sp_who2 129
+exec sp_lock 129
+exec sp_WhoIsActive @get_plans = 1, @get_transaction_info = 1
+
+-- Kill the process
+Kill 129
