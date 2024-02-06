@@ -8,7 +8,7 @@
 8. Change database owner to sa for all user databases
 9. Stored Procedure User Migration
 10. Release Table Locking
-
+11. Delete BigData Without Locking
 
 ------------------------1. Last Activity Database--------------------------
 SELECT d.name,
@@ -380,3 +380,11 @@ exec sp_WhoIsActive @get_plans = 1, @get_transaction_info = 1
 
 -- Kill the process
 Kill 129
+
+------------------------11. Delete BigData Without Locking------------------------
+DECLARE @done bit = 0;  
+WHILE (@done = 0)  
+BEGIN  
+    DELETE TOP(1000) FROM TB_SINTA WHERE LOG <= '2023-08-01';  
+    IF @@rowcount < 1000 SET @done = 1;  
+END;
