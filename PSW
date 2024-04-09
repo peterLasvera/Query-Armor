@@ -1,0 +1,13 @@
+cd /u/psw900/psw/host/FIFO
+fifostt -v -z1 S9901h0.12246.CT316 -r dispreply=r -e62:12,21:6 -t 0 > /u/bck900/tmp/peter/fifostt-today-srv.txt
+JATIMPRD-233::/u/bck900/tmp/peter> cat fifost240408.txt | grep -E '^.{79}93' |grep -c "00$"
+148
+JATIMPRD-233::/u/bck900/tmp/peter> cat fifost240408.txt | grep -E '^.{79}13' |grep -c "00$"
+121600
+JATIMPRD-233::/u/bck900/tmp/peter> cat fifost240408.txt | grep -E '^.{79}08' |grep -c "00$"
+35157
+JATIMPRD-233::/u/bck900/tmp/peter> cat fifost240408.txt | grep -E '^.{79}02' |grep -c "00$"
+701915
+JATIMPRD-233::/u/bck900/tmp/peter> cat fifost240408.txt | grep -E '^.{79}14' |grep -c "00$"
+36889
+
