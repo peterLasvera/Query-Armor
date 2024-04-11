@@ -6,6 +6,7 @@
 6. Check Tablespace
 7. Alter Session
 8. Check Tablespace by MII
+9. Alter Read Write Pluggable Database
 
 
 -----------------1. Monitoring Fast Recovery Area Space Usage-------------------
@@ -160,3 +161,8 @@ AND d.tablespace_name = s.tablespace_name(+)
 AND d.contents = 'UNDO'
 ORDER BY 11 desc 
 /
+
+------------------------9. Alter Read Write Pluggable Database-----------------------------
+show pdbs
+
+ALTER PLUGGABLE DATABASE <pdb-name> OPEN READ WRITE
