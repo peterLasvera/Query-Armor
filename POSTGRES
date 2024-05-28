@@ -2,6 +2,7 @@
 2. Create Role Read Only and Read Write
 3. Check Hostname
 4. Check Streaming Replication Lagging (in Second)
+5. Remote Backup Restore with compressed
 
 ------------------1. Check All Database Size-------------------
 SELECT pg_database.datname as "database_name", pg_database_size(pg_database.datname)/1024/1024 AS size_in_mb FROM pg_database ORDER by size_in_mb DESC;
@@ -44,4 +45,8 @@ GRANT read_only TO my_database_read_only;
 select pg_read_file('/etc/hostname') as hostname;
 
 ------------------4. Check Streaming Replication Lagging (in Second)-------------------
-SELECT pg_is_in_recovery() AS is_slave, pg_last_wal_receive_lsn() AS receive, pg_last_wal_replay_lsn() AS replay, pg_last_wal_receive_lsn() = pg_last_wal_replay_lsn() AS synced,EXTRACT(SECONDS FROM now() - pg_last_xact_replay_timestamp())::float AS lag;
+SELECT pg_is_in_recovery() AS is_slave, pg_last_wal_receive_lsn() AS receive, pg_last_wal_replay_lsn() AS replay, 
+pg_last_wal_receive_lsn() = pg_last_wal_replay_lsn() AS synced,EXTRACT(SECONDS FROM now() - pg_last_xact_replay_timestamp())::float AS lag;
+
+------------------5. Remote Backup Restore with compressed-----------------------------
+pg_dump -C dbname | ssh -C remoteuser@remotehost "psql dbname"
