@@ -3,6 +3,7 @@
 3. Check Hostname
 4. Check Streaming Replication Lagging (in Second)
 5. Remote Backup Restore with compressed
+6. Find Locked Table and Kill pid
 
 ------------------1. Check All Database Size-------------------
 SELECT pg_database.datname as "database_name", pg_database_size(pg_database.datname)/1024/1024 AS size_in_mb FROM pg_database ORDER by size_in_mb DESC;
@@ -50,3 +51,8 @@ pg_last_wal_receive_lsn() = pg_last_wal_replay_lsn() AS synced,EXTRACT(SECONDS F
 
 ------------------5. Remote Backup Restore with compressed-----------------------------
 pg_dump -C dbname | ssh -C remoteuser@remotehost "psql dbname"
+
+------------------6. Find Locked Table and Kill pid-----------------------
+SELECT 'SELECT pg_terminate_backend('||pid||');'
+  FROM pg_locks l
+  JOIN pg_class t ON l.relation = t.oid AND t.relkind = 'r' and relname='mst_setting_simpanan_sya'
