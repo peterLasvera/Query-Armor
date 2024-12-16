@@ -37,7 +37,7 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA my_schema GRANT SELECT ON TABLES TO read_only
 
 -- Users
 CREATE USER read_write_user WITH PASSWORD 'password_1';
-GRANT read_write TO my_database;
+GRANT read_write TO read_write_user;
 
 CREATE USER read_only_user WITH PASSWORD 'password_2';
 GRANT read_only TO my_database_read_only;
